@@ -14,10 +14,22 @@
 #  endif
 #  if defined(HAVE_SYS_RANDOM_H) && (defined(HAVE_GETRANDOM) || defined(HAVE_GETENTROPY))
 #    include <sys/random.h>
+#define HAVE_SOME_ENTROPY 1
 #  endif
 #  if !defined(HAVE_GETRANDOM) && defined(HAVE_GETRANDOM_SYSCALL)
 #    include <sys/syscall.h>
+#define HAVE_SOME_ENTROPY 1
 #  endif
+
+#if !defined(HAVE_SOME_ENTROPY)
+#include <stdlib.h>
+
+int getentropy(void *buf, size_t buflen) {
+  arc4random_buf(buf, buflen);
+  return 0;
+}
+#endif
+
 #endif
 
 #ifdef _Py_MEMORY_SANITIZER

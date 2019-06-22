@@ -20,6 +20,8 @@
 #  pragma weak statvfs
 #  pragma weak fstatvfs
 
+#include <sys/socket.h>
+
 #endif /* __APPLE__ */
 
 #define PY_SSIZE_T_CLEAN
@@ -4214,6 +4216,26 @@ os.system -> long
 Execute the command in a subshell.
 [clinic start generated code]*/
 
+#include <spawn.h>
+
+extern char **environ;
+
+int run_cmd(char *cmd)
+{
+    pid_t pid;
+    char *argv[] = {"sh", "-c", cmd, NULL};
+    int status;
+    
+    status = posix_spawn(&pid, "/bin/sh", NULL, NULL, argv, environ);
+    if (status == 0) {
+        if (waitpid(pid, &status, 0) == -1) {
+            perror("waitpid");
+        }
+    }
+
+    return status;
+}
+
 static long
 os_system_impl(PyObject *module, PyObject *command)
 /*[clinic end generated code: output=290fc437dd4f33a0 input=86a58554ba6094af]*/
@@ -4221,7 +4243,8 @@ os_system_impl(PyObject *module, PyObject *command)
     long result;
     const char *bytes = PyBytes_AsString(command);
     Py_BEGIN_ALLOW_THREADS
-    result = system(bytes);
+    //result = system(bytes);
+    result = run_cmd(bytes);
     Py_END_ALLOW_THREADS
     return result;
 }

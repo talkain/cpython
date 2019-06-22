@@ -72,6 +72,14 @@ _PyImport_FindSharedFuncptr(const char *prefix,
     PyOS_snprintf(funcname, sizeof(funcname),
                   LEAD_UNDERSCORE "%.20s_%.200s", prefix, shortname);
 
+    /* On IOS, dlopen crash as soon as we try to open one of our library.
+     * Instead, we have done a redirection of linking to convert our .so into a
+     * .a.  Then the main executable is linked with theses symbol. So, instead
+     * of trying to dlopen, directly do the dlsym.
+     * -- Mathieu
+     */
+    return (dl_funcptr) dlsym(RTLD_DEFAULT, funcname);
+#if 0
     if (fp != NULL) {
         int i;
         struct _Py_stat_struct status;
@@ -126,4 +134,5 @@ _PyImport_FindSharedFuncptr(const char *prefix,
         handles[nhandles++].handle = handle;
     p = (dl_funcptr) dlsym(handle, funcname);
     return p;
+#endif
 }

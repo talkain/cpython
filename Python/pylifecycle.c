@@ -983,12 +983,15 @@ _Py_InitializeMainInterpreter(PyInterpreterState *interp,
 
     _PyRuntime.initialized = 1;
 
+#if 0
     if (!Py_NoSiteFlag) {
         err = initsite(); /* Module site */
         if (_Py_INIT_FAILED(err)) {
             return err;
         }
     }
+#endif
+
     return _Py_INIT_OK();
 }
 

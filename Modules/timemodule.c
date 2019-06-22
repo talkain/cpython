@@ -256,7 +256,7 @@ time_clock_settime(PyObject *self, PyObject *args)
     if (_PyTime_AsTimespec(t, &tp) == -1)
         return NULL;
 
-    ret = clock_settime((clockid_t)clk_id, &tp);
+    ret = -1;//clock_settime((clockid_t)clk_id, &tp);
     if (ret != 0) {
         PyErr_SetFromErrno(PyExc_OSError);
         return NULL;
@@ -289,7 +289,7 @@ time_clock_settime_ns(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    ret = clock_settime((clockid_t)clk_id, &ts);
+    ret = -1; //clock_settime((clockid_t)clk_id, &ts);
     if (ret != 0) {
         PyErr_SetFromErrno(PyExc_OSError);
         return NULL;
